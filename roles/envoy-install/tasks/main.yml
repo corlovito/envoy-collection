@@ -1,0 +1,9 @@
+---
+- name: Include preflight checks
+  ansible.builtin.include_tasks: preflight.yml
+
+- name: Include prerequisites
+  ansible.builtin.include_tasks: prerequisite.yml
+
+- name: Include installation
+  ansible.builtin.include_tasks: install.yml 

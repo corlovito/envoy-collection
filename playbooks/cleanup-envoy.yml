@@ -1,0 +1,76 @@
+---
+- name: Cleanup old Envoy installation
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Stop Envoy service
+      ansible.builtin.service:
+        name: envoy
+        state: stopped
+      ignore_errors: yes
+
+    - name: Disable Envoy service
+      ansible.builtin.service:
+        name: envoy
+        enabled: no
+      ignore_errors: yes
+
+    - name: Remove Envoy systemd service file
+      ansible.builtin.file:
+        path: /etc/systemd/system/envoy.service
+        state: absent
+      ignore_errors: yes
+
+    - name: Remove Envoy binary
+      ansible.builtin.file:
+        path: /usr/local/bin/envoy
+        state: absent
+      ignore_errors: yes
+
+    - name: Remove Envoy configuration directory
+      ansible.builtin.file:
+        path: /etc/envoy
+        state: absent
+      ignore_errors: yes
+
+    - name: Remove Envoy log files
+      ansible.builtin.file:
+        path: /var/log/envoy
+        state: absent
+      ignore_errors: yes
+
+    - name: Remove Envoy log file
+      ansible.builtin.file:
+        path: /var/log/envoy_admin.log
+        state: absent
+      ignore_errors: yes
+
+    - name: Remove Envoy user
+      ansible.builtin.user:
+        name: envoy
+        state: absent
+        remove: yes
+      ignore_errors: yes
+
+    - name: Remove Envoy group
+      ansible.builtin.group:
+        name: envoy
+        state: absent
+      ignore_errors: yes
+
+    - name: Clean up Envoy shared memory
+      ansible.builtin.shell: |
+        rm -f /dev/shm/envoy_shared_memory_*
+        rm -f /tmp/envoy_shared_memory_*
+      ignore_errors: yes
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+      ignore_errors: yes
+
+    - name: Display cleanup status
+      ansible.builtin.debug:
+        msg: "Old Envoy installation has been cleaned up" 

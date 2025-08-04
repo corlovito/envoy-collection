@@ -1,0 +1,67 @@
+# {{ ansible_managed }}
+# Envoy configuration with includes
+
+admin:
+  address:
+    socket_address:
+      address: {{ envoy_admin_host | default('0.0.0.0') }}
+      port_value: {{ envoy_admin_port | default(9901) }}
+  access_log_path: {{ envoy_admin_access_log_path | default('/var/log/envoy_admin.log') }}
+
+{% if envoy_use_includes %}
+# Include external configuration files
+{% for include in envoy_includes %}
+{% include include.template %}
+{% endfor %}
+{% else %}
+# Static configuration
+static_resources:
+  listeners:
+  {% for listener in envoy_listeners %}
+    - name: {{ listener.name }}
+      address:
+        socket_address:
+          address: {{ listener.address | default('0.0.0.0') }}
+          port_value: {{ listener.port }}
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: {{ listener.stat_prefix | default('ingress_http') }}
+                codec_type: AUTO
+                route_config:
+                  name: {{ listener.route_config_name | default('local_route') }}
+                  virtual_hosts:
+                    - name: {{ listener.virtual_host_name | default('local_service') }}
+                      domains: {{ listener.domains | default(['*']) | to_json }}
+                      routes:
+                        - match:
+                            prefix: {{ listener.route_prefix | default('/') }}
+                          route:
+                            cluster: {{ listener.cluster | default('example_service') }}
+                http_filters:
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+  {% endfor %}
+
+  clusters:
+  {% for cluster in envoy_clusters %}
+    - name: {{ cluster.name }}
+      connect_timeout: {{ cluster.connect_timeout | default('0.25s') }}
+      type: {{ cluster.type | default('STATIC') }}
+      lb_policy: {{ cluster.lb_policy | default('ROUND_ROBIN') }}
+      load_assignment:
+        cluster_name: {{ cluster.name }}
+        endpoints:
+          - lb_endpoints:
+            {% for endpoint in cluster.endpoints %}
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: {{ endpoint.address }}
+                      port_value: {{ endpoint.port }}
+            {% endfor %}
+  {% endfor %}
+{% endif %} 

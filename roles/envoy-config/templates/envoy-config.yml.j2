@@ -1,0 +1,85 @@
+# {{ ansible_managed }}
+# Пример конфигурации Envoy Proxy
+
+# Базовые настройки
+envoy_version: "1.28.0"
+envoy_admin_host: "{{ ansible_default_ipv4.address | default('0.0.0.0') }}"
+
+# Конфигурация listeners
+envoy_listeners:
+  - name: web_listener
+    address: "0.0.0.0"
+    port: 80
+    stat_prefix: "web_http"
+    route_config_name: "web_route"
+    virtual_host_name: "web_service"
+    domains: ["*"]
+    route_prefix: "/"
+    cluster: "web_cluster"
+  
+  - name: api_listener
+    address: "0.0.0.0"
+    port: 8080
+    stat_prefix: "api_http"
+    route_config_name: "api_route"
+    virtual_host_name: "api_service"
+    domains: ["*"]
+    route_prefix: "/api"
+    cluster: "api_cluster"
+
+# Конфигурация clusters
+envoy_clusters:
+  - name: "web_cluster"
+    connect_timeout: "0.25s"
+    type: "STATIC"
+    lb_policy: "ROUND_ROBIN"
+    health_checks:
+      - timeout: "1s"
+        interval: "10s"
+        interval_jitter: "1s"
+        unhealthy_threshold: 1
+        healthy_threshold: 1
+        path: "/health"
+    endpoints:
+      - address: "10.0.1.10"
+        port: 8080
+        health_check_config:
+          port: 8080
+      - address: "10.0.1.11"
+        port: 8080
+        health_check_config:
+          port: 8080
+  
+  - name: "api_cluster"
+    connect_timeout: "0.5s"
+    type: "STATIC"
+    lb_policy: "LEAST_REQUEST"
+    health_checks:
+      - timeout: "2s"
+        interval: "15s"
+        interval_jitter: "2s"
+        unhealthy_threshold: 2
+        healthy_threshold: 1
+        path: "/api/health"
+    endpoints:
+      - address: "10.0.1.20"
+        port: 3000
+        health_check_config:
+          port: 3000
+      - address: "10.0.1.21"
+        port: 3000
+        health_check_config:
+          port: 3000
+
+# Опциональные настройки TLS
+# envoy_secrets:
+#   - name: "example_cert"
+#     tls_certificate:
+#       certificate_chain: "/etc/envoy/certs/cert.pem"
+#       private_key: "/etc/envoy/certs/key.pem"
+
+# Опциональные runtime настройки
+# envoy_runtime:
+#   symlink_root: "/etc/envoy/runtime"
+#   subdirectory: ""
+#   override_subdirectory: "" 

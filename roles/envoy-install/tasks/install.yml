@@ -1,0 +1,46 @@
+---
+- name: Download Envoy binary
+  ansible.builtin.get_url:
+    url: "{{ envoy_download_url }}"
+    dest: "{{ envoy_download_path }}"
+    mode: "0644"
+  when: not envoy_binary.stat.exists or (envoy_version_check.stdout is defined and envoy_version not in envoy_version_check.stdout)
+
+- name: Unpack Envoy binaries
+  ansible.builtin.unarchive:
+    src: "{{ envoy_download_path }}"
+    dest: "{{ envoy_unarchive_dest }}"
+    creates: "{{ envoy_unarchive_creates }}"
+    remote_src: true
+  when: not envoy_binary.stat.exists or (envoy_version_check.stdout is defined and envoy_version not in envoy_version_check.stdout)
+
+- name: Copy Envoy binary to final location
+  ansible.builtin.copy:
+    src: "{{ envoy_unarchive_dest }}/envoy-v{{ envoy_version }}-{{ envoy_arch }}/bin/envoy"
+    dest: "{{ envoy_bin_path }}/envoy"
+    mode: "0755"
+    remote_src: true
+  when: not envoy_binary.stat.exists or (envoy_version_check.stdout is defined and envoy_version not in envoy_version_check.stdout)
+
+- name: Create hot-restarter script
+  ansible.builtin.template:
+    src: hot-restarter.py.j2
+    dest: /usr/local/bin/hot-restarter.py
+    mode: "0755"
+  when: envoy_use_hot_restart
+  notify: reload systemd
+
+- name: Create start-envoy script
+  ansible.builtin.template:
+    src: start-envoy.sh.j2
+    dest: /usr/local/bin/start-envoy.sh
+    mode: "0755"
+  when: envoy_use_hot_restart
+  notify: reload systemd
+
+- name: Create systemd service unit
+  ansible.builtin.template:
+    src: envoy-hot-restart.service.j2
+    dest: /etc/systemd/system/envoy.service
+    mode: "0644"
+  notify: reload systemd 

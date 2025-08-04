@@ -1,0 +1,83 @@
+---
+# Envoy user and group settings (inherited from envoy-install)
+envoy_user: "envoy"
+envoy_group: "envoy"
+
+# Envoy configuration settings
+envoy_conf_path: "/etc/envoy"
+envoy_config_file: "envoy.yaml"
+
+# Include configuration support
+envoy_use_includes: false  # Enable/disable include configs
+envoy_includes_path: "/etc/envoy/conf.d"  # Path for include configs
+envoy_includes: []  # List of include configs
+# Example:
+# envoy_includes:
+#   - name: "listeners.yml"
+#     template: "listeners.yaml.j2"
+#   - name: "clusters.yml"
+#     template: "clusters.yaml.j2"
+
+# Template selection
+envoy_config_template: "envoy-loadbalancer.yaml.j2"  # envoy-simple.yml.j2, envoy-config.yml.j2, or custom
+
+# Default admin configuration
+envoy_admin_host: "0.0.0.0"
+envoy_admin_port: 9901
+envoy_admin_access_log_path: "/var/log/envoy_admin.log"
+# envoy_admin_profile_path: "/var/log/envoy_admin.prof"  # Optional
+
+# Default listener configuration
+envoy_listeners:
+  - name: listener_0
+    address: "0.0.0.0"
+    port: 8080
+    stat_prefix: "ingress_http"
+    route_config_name: "local_route"
+    virtual_host_name: "local_service"
+    domains: ["*"]
+    route_prefix: "/"
+    cluster: "example_service"
+    # Optional: custom filter chains
+    # filter_chains:
+    #   - filters:
+    #     - name: envoy.filters.network.http_connection_manager
+    #       typed_config:
+    #         type: type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+    #         config:
+    #           stat_prefix: ingress_http
+    #           codec_type: AUTO
+
+# Default cluster configuration
+envoy_clusters:
+  - name: "example_service"
+    connect_timeout: "0.25s"
+    type: "STATIC"
+    lb_policy: "ROUND_ROBIN"
+    # Optional: health checks
+    # health_checks:
+    #   - timeout: "1s"
+    #     interval: "10s"
+    #     interval_jitter: "1s"
+    #     unhealthy_threshold: 1
+    #     healthy_threshold: 1
+    #     path: "/health"
+    endpoints:
+      - address: "127.0.0.1"
+        port: 8081
+        # Optional: health check config
+        # health_check_config:
+        #   port: 8081
+
+# Optional: TLS secrets configuration
+# envoy_secrets:
+#   - name: "example_cert"
+#     tls_certificate:
+#       certificate_chain: "/etc/envoy/certs/cert.pem"
+#       private_key: "/etc/envoy/certs/key.pem"
+
+# Optional: Runtime configuration
+# envoy_runtime:
+#   symlink_root: "/etc/envoy/runtime"
+#   subdirectory: ""
+#   override_subdirectory: "" 

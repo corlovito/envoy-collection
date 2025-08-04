@@ -1,0 +1,28 @@
+# {{ ansible_managed }}
+# Простая конфигурация Envoy Proxy
+
+# Базовые настройки
+envoy_version: "1.28.0"
+envoy_admin_host: "{{ ansible_default_ipv4.address | default('0.0.0.0') }}"
+
+# Простая конфигурация listeners
+envoy_listeners:
+  - name: listener_0
+    address: "0.0.0.0"
+    port: 8080
+    stat_prefix: "ingress_http"
+    route_config_name: "local_route"
+    virtual_host_name: "local_service"
+    domains: ["*"]
+    route_prefix: "/"
+    cluster: "example_service"
+
+# Простая конфигурация clusters
+envoy_clusters:
+  - name: "example_service"
+    connect_timeout: "0.25s"
+    type: "STATIC"
+    lb_policy: "ROUND_ROBIN"
+    endpoints:
+      - address: "127.0.0.1"
+        port: 8081 

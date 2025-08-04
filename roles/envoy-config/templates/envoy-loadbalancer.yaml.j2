@@ -1,0 +1,58 @@
+# {{ ansible_managed }}
+# Load Balancer configuration for Envoy Proxy
+
+admin:
+  address:
+    socket_address:
+      address: {{ envoy_admin_host | default('0.0.0.0') }}
+      port_value: {{ envoy_admin_port | default(9901) }}
+  access_log_path: {{ envoy_admin_access_log_path | default('/var/log/envoy_admin.log') }}
+
+static_resources:
+  listeners:
+    - name: web_lb
+      address:
+        socket_address:
+          address: {{ envoy_listeners[0].address | default('0.0.0.0') }}
+          port_value: {{ envoy_listeners[0].port | default(8080) }}
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: {{ envoy_listeners[0].stat_prefix | default('ingress_http') }}
+                codec_type: AUTO
+                route_config:
+                  name: {{ envoy_listeners[0].route_config_name | default('local_route') }}
+                  virtual_hosts:
+                    - name: {{ envoy_listeners[0].virtual_host_name | default('local_service') }}
+                      domains: {{ envoy_listeners[0].domains | default(['*']) | to_json }}
+                      routes:
+                        - match:
+                            prefix: {{ envoy_listeners[0].route_prefix | default('/') }}
+                          route:
+                            cluster: {{ envoy_listeners[0].cluster | default('web_cluster') }}
+                http_filters:
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+  clusters:
+    - name: {{ envoy_clusters[0].name | default('web_cluster') }}
+      connect_timeout: {{ envoy_clusters[0].connect_timeout | default('0.25s') }}
+      type: {{ envoy_clusters[0].type | default('STATIC') }}
+      lb_policy: {{ envoy_clusters[0].lb_policy | default('ROUND_ROBIN') }}
+      load_assignment:
+        cluster_name: {{ envoy_clusters[0].name | default('web_cluster') }}
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: {{ envoy_clusters[0].endpoints[0].address | default('127.0.0.1') }}
+                      port_value: {{ envoy_clusters[0].endpoints[0].port | default(8081) }}
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: {{ envoy_clusters[0].endpoints[1].address | default('127.0.0.1') }}
+                      port_value: {{ envoy_clusters[0].endpoints[1].port | default(8082) }} 

@@ -1,0 +1,42 @@
+---
+- name: Prepare system for Envoy and BIRD BGP installation
+  hosts: all
+  gather_facts: true
+  gather_subset: ["!all", "min"]
+  become: true
+  tasks:
+    - name: Update package cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install netplan (required for BIRD BGP role)
+      ansible.builtin.apt:
+        name: netplan.io
+        state: present
+
+    - name: Create netplan directory
+      ansible.builtin.file:
+        path: /etc/netplan
+        state: directory
+        mode: '0755'
+
+    - name: Create basic netplan configuration
+      ansible.builtin.copy:
+        dest: /etc/netplan/01-netcfg.yaml
+        content: |
+          network:
+            version: 2
+            renderer: networkd
+            ethernets:
+              lo:
+                addresses:
+                  - 127.0.0.1/8
+                  - ::1/128
+        mode: '0644'
+      notify: apply netplan
+
+  handlers:
+    - name: apply netplan
+      ansible.builtin.command: netplan apply
+      become: true 

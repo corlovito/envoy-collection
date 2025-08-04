@@ -1,0 +1,32 @@
+---
+- name: Add the envoy group
+  ansible.builtin.group:
+    name: "{{ envoy_group }}"
+    state: present
+
+- name: Add the envoy user
+  ansible.builtin.user:
+    name: "{{ envoy_user }}"
+    group: "{{ envoy_group }}"
+    comment: "Envoy Proxy user"
+    system: "{{ envoy_system_user }}"
+    createhome: false
+    shell: /sbin/nologin
+    state: present
+
+- name: Create log directory for Envoy
+  ansible.builtin.file:
+    path: /var/log/envoy
+    state: directory
+    owner: "{{ envoy_user }}"
+    group: "{{ envoy_group }}"
+    mode: "0755"
+
+- name: Create log file for Envoy admin
+  ansible.builtin.copy:
+    content: ""
+    dest: /var/log/envoy_admin.log
+    owner: "{{ envoy_user }}"
+    group: "{{ envoy_group }}"
+    mode: "0644"
+    force: false 

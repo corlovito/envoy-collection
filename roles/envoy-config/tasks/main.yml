@@ -1,0 +1,47 @@
+---
+- name: Check if Envoy is installed
+  ansible.builtin.stat:
+    path: "{{ envoy_bin_path | default('/usr/local/bin') }}/envoy"
+  register: envoy_binary
+
+- name: Fail if Envoy is not installed
+  ansible.builtin.fail:
+    msg: "Envoy is not installed. Please install Envoy first or use envoy-install role."
+  when: not envoy_binary.stat.exists
+
+- name: Create Envoy configuration directory
+  ansible.builtin.file:
+    path: "{{ envoy_conf_path }}"
+    state: directory
+    owner: "{{ envoy_user }}"
+    group: "{{ envoy_group }}"
+    mode: "0750"
+
+- name: Create Envoy includes directory
+  ansible.builtin.file:
+    path: "{{ envoy_includes_path }}"
+    state: directory
+    owner: "{{ envoy_user }}"
+    group: "{{ envoy_group }}"
+    mode: "0750"
+  when: envoy_use_includes
+
+- name: Create include configuration files
+  ansible.builtin.template:
+    src: "{{ item.template }}"
+    dest: "{{ envoy_includes_path }}/{{ item.name }}"
+    owner: "{{ envoy_user }}"
+    group: "{{ envoy_group }}"
+    mode: "0640"
+  loop: "{{ envoy_includes }}"
+  when: envoy_use_includes
+  notify: restart envoy
+
+- name: Create Envoy configuration file from template
+  ansible.builtin.template:
+    src: "{{ envoy_config_template | default('envoy-loadbalancer.yaml.j2') }}"
+    dest: "{{ envoy_conf_path }}/{{ envoy_config_file }}"
+    owner: "{{ envoy_user }}"
+    group: "{{ envoy_group }}"
+    mode: "0640"
+  notify: restart envoy 

@@ -1,0 +1,6 @@
+---
+- name: Import install playbook
+  ansible.builtin.import_playbook: ../../playbooks/install-envoy-only.yml
+
+- name: Import configure playbook
+  ansible.builtin.import_playbook: ../../playbooks/configure-envoy.yml 

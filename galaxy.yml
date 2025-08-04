@@ -1,0 +1,38 @@
+namespace: evotor
+name: envoy
+version: 1.0.0
+readme: README.md
+authors:
+  - Evotor Team
+description: Ansible collection for Envoy Proxy installation and configuration with BIRD BGP integration and hot restart support
+license:
+  - MIT
+tags:
+  - proxy
+  - loadbalancer
+  - envoy
+  - bgp
+  - bird
+  - networking
+  - infrastructure
+  - service-mesh
+repository: https://gitlab.evotor.ru/iaac/ansible/envoy
+documentation: https://gitlab.evotor.ru/iaac/ansible/envoy
+homepage: https://gitlab.evotor.ru/iaac/ansible/envoy
+issues: https://gitlab.evotor.ru/iaac/ansible/envoy/-/issues
+dependencies:
+  ansible.posix: ">=2.1.0"
+  community.general: ">=11.1.0"
+build_ignore:
+  - .gitignore
+  - .venv/
+  - molecule/
+  - requirements.tmpl
+  - requirements.txt
+  - playbooks/
+  - .ansible/
+  - "*.pyc"
+  - __pycache__/
+  - .pytest_cache/
+  - .coverage
+  - .tox/ 

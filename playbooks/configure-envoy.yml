@@ -1,0 +1,34 @@
+---
+- name: Update Envoy configuration
+  hosts: all
+  become: true
+  gather_facts: true
+  
+  vars:
+    envoy_config_template: "envoy-loadbalancer.yaml.j2"
+    
+    # Настройки для load balancer
+    envoy_listeners:
+      - name: web_lb
+        address: "0.0.0.0"
+        port: 8080
+        stat_prefix: "web_http"
+        route_config_name: "web_route"
+        virtual_host_name: "web_service"
+        domains: ["*"]
+        route_prefix: "/"
+        cluster: "web_cluster"
+    
+    envoy_clusters:
+      - name: web_cluster
+        connect_timeout: "0.5s"
+        type: "STATIC"
+        lb_policy: "ROUND_ROBIN"
+        endpoints:
+          - address: "127.0.0.1"
+            port: 8081
+          - address: "127.0.0.1"
+            port: 8082
+
+  roles:
+    - role: envoy-config 

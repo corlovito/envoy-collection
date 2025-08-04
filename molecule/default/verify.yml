@@ -1,0 +1,32 @@
+---
+- name: Verify Envoy admin interface
+  hosts: all
+  become: true
+  tasks:
+    - name: Wait for Envoy admin port to be accessible
+      ansible.builtin.wait_for:
+        host: "127.0.0.1"
+        port: 9901
+        timeout: 30
+      register: envoy_admin_port
+
+    - name: Verify Envoy admin port is accessible
+      ansible.builtin.assert:
+        that:
+          - envoy_admin_port.elapsed < 30
+        fail_msg: "Envoy admin port not accessible"
+        success_msg: "Envoy admin port is accessible"
+
+    - name: Test Envoy admin interface with curl
+      ansible.builtin.uri:
+        url: http://127.0.0.1:9901/stats
+        method: GET
+        status_code: 200
+      register: envoy_admin_response
+
+    - name: Verify Envoy admin interface responds
+      ansible.builtin.assert:
+        that:
+          - envoy_admin_response.status == 200
+        fail_msg: "Envoy admin interface not responding"
+        success_msg: "Envoy admin interface is responding" 

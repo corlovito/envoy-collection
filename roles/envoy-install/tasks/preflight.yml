@@ -1,0 +1,17 @@
+---
+- name: Check if Envoy is already installed
+  ansible.builtin.stat:
+    path: "{{ envoy_bin_path }}/envoy"
+  register: envoy_binary
+
+- name: Get current Envoy version if installed
+  ansible.builtin.command: "{{ envoy_bin_path }}/envoy --version"
+  register: envoy_version_check
+  changed_when: false
+  failed_when: false
+  when: envoy_binary.stat.exists
+
+- name: Display current Envoy version
+  ansible.builtin.debug:
+    msg: "Current Envoy version: {{ envoy_version_check.stdout }}"
+  when: envoy_binary.stat.exists and envoy_version_check.rc == 0 
