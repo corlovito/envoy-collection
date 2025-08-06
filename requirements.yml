@@ -5,7 +5,6 @@ collections:
   - name: evotor.envoy
     type: git
     source: git@gitlab.evotor.ru:iaac/ansible/envoy-collection.git
-    version: main
 
 # Roles
 roles:
