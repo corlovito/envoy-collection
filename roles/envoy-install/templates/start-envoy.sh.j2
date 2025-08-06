@@ -6,8 +6,8 @@
 
 set -e
 
-# Envoy binary path
-ENVOY_BIN="{{ envoy_bin_path }}/envoy"
+# Envoy binary path (installed via APT)
+ENVOY_BIN="/usr/bin/envoy"
 
 # Configuration file
 CONFIG_FILE="/etc/envoy/envoy.yaml"

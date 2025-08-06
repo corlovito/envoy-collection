@@ -1,26 +1,39 @@
 ---
-- name: Download Envoy binary
+- name: Install prerequisites for Envoy repository
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg2
+      - lsb-release
+    state: present
+    update_cache: true
+
+- name: Create keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Add Envoy GPG apt key
   ansible.builtin.get_url:
-    url: "{{ envoy_download_url }}"
-    dest: "{{ envoy_download_path }}"
-    mode: "0644"
-  when: not envoy_binary.stat.exists or (envoy_version_check.stdout is defined and envoy_version not in envoy_version_check.stdout)
+    url: https://apt.envoyproxy.io/signing.key
+    dest: /etc/apt/keyrings/envoy-keyring.asc
+    mode: '0644'
+    force: true
 
-- name: Unpack Envoy binaries
-  ansible.builtin.unarchive:
-    src: "{{ envoy_download_path }}"
-    dest: "{{ envoy_unarchive_dest }}"
-    creates: "{{ envoy_unarchive_creates }}"
-    remote_src: true
-  when: not envoy_binary.stat.exists or (envoy_version_check.stdout is defined and envoy_version not in envoy_version_check.stdout)
+- name: Add Envoy repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/envoy-keyring.asc] https://apt.envoyproxy.io {{ ansible_distribution_release }} main"
+    state: present
+    filename: envoy
 
-- name: Copy Envoy binary to final location
-  ansible.builtin.copy:
-    src: "{{ envoy_unarchive_dest }}/envoy-v{{ envoy_version }}-{{ envoy_arch }}/bin/envoy"
-    dest: "{{ envoy_bin_path }}/envoy"
-    mode: "0755"
-    remote_src: true
-  when: not envoy_binary.stat.exists or (envoy_version_check.stdout is defined and envoy_version not in envoy_version_check.stdout)
+- name: Install Envoy
+  ansible.builtin.apt:
+    name: envoy{% if envoy_version != 'latest' %}={{ envoy_version }}*{% endif %}
+    state: present
+    update_cache: true
 
 - name: Create hot-restarter script
   ansible.builtin.template:
@@ -43,4 +56,4 @@
     src: envoy-hot-restart.service.j2
     dest: /etc/systemd/system/envoy.service
     mode: "0644"
-  notify: reload systemd 
+  notify: reload systemd

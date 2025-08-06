@@ -1,12 +1,4 @@
 ---
-# Ansible Galaxy dependencies for envoy project
-
-collections:
-  - name: evotor.envoy
-    type: git
-    source: git@gitlab.evotor.ru:iaac/ansible/envoy-collection.git
-
-# Roles
 roles:
   - name: os_bird_bgp
     src: "git@gitlab.evotor.ru:iaac/ansible/opensearch.git"

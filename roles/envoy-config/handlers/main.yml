@@ -1,6 +1,6 @@
 ---
-- name: restart envoy
+- name: Restart envoy
   ansible.builtin.systemd:
     name: envoy
     state: reloaded
-  # Note: This sends SIGHUP to hot-restarter.py which triggers hot restart 
+  # Note: This sends SIGHUP to hot-restarter.py which triggers hot restart

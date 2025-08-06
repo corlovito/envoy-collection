@@ -1,7 +1,7 @@
 ---
 - name: Check if Envoy is installed
   ansible.builtin.stat:
-    path: "{{ envoy_bin_path | default('/usr/local/bin') }}/envoy"
+    path: "/usr/bin/envoy"
   register: envoy_binary
 
 - name: Fail if Envoy is not installed
@@ -44,4 +44,4 @@
     owner: "{{ envoy_user }}"
     group: "{{ envoy_group }}"
     mode: "0640"
-  notify: restart envoy 
+  notify: restart envoy

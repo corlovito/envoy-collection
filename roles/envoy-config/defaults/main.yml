@@ -80,4 +80,4 @@ envoy_clusters:
 # envoy_runtime:
 #   symlink_root: "/etc/envoy/runtime"
 #   subdirectory: ""
-#   override_subdirectory: "" 
+#   override_subdirectory: ""

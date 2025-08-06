@@ -1,7 +1,6 @@
 ---
 # Envoy installation settings
-envoy_version: "1.28.0"
-envoy_bin_path: "/usr/local/bin"
+envoy_version: "latest"  # Can be "latest" or specific version like "1.28.0"
 envoy_user: "envoy"
 envoy_group: "envoy"
 envoy_system_user: true
@@ -13,21 +12,6 @@ envoy_use_hot_restart: true  # Use hot-restarter.py for zero-downtime restarts
 envoy_hot_restart_term_wait: 30  # Seconds to wait for graceful shutdown
 envoy_hot_restart_log_level: "INFO"  # Log level for hot-restarter
 
-# Download settings
-envoy_architecture_map:
-  amd64: amd64
-  x86_64: amd64
-  armv7l: arm
-  aarch64: arm64
-  32-bit: "386"
-  64-bit: amd64
-
-envoy_arch: "linux-{{ envoy_architecture_map[ansible_architecture] }}"
-envoy_download_url: "https://archive.tetratelabs.io/envoy/download/v{{ envoy_version }}/envoy-v{{ envoy_version }}-{{ envoy_arch }}.tar.xz"
-envoy_download_path: "/tmp/envoy-v{{ envoy_version }}-{{ envoy_arch }}.tar.xz"
-envoy_unarchive_dest: "/tmp"
-envoy_unarchive_creates: "/tmp/envoy-v{{ envoy_version }}-{{ envoy_arch }}/bin/envoy"
-
 # Systemd service
 envoy_systemd: true
 
@@ -35,4 +19,4 @@ envoy_systemd: true
 os_bird_bgp_address: "10.0.1.255"
 os_bird_bgp_local_as: 65535
 os_bird_neighbour_name: "test_router"
-os_bird_neighbour_address: "10.22.1.1" 
+os_bird_neighbour_address: "10.22.1.1"
