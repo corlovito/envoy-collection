@@ -14,4 +14,5 @@ provisioner:
   name: ansible
   options:
     extra-vars: envoy_roles__environment=evo
-  # env переменные теперь задаются через wrapper или напрямую
+  env:
+    ANSIBLE_ROLES_PATH: ${VIRTUAL_ENV}/../roles:${HOME}/.ansible/roles
