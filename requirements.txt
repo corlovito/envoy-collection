@@ -1,4 +1,5 @@
+# Основные пакеты для тестирования Ansible ролей
 ansible>=11.8.0
-molecule>=25.7.0
-molecule-vagrant>=2.0.0
+molecule==6.0.2
+molecule-plugins[vagrant]==23.5.0
 mitogen>=0.3.22
