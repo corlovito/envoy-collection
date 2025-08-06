@@ -35,7 +35,7 @@
     mode: "0640"
   loop: "{{ envoy_includes }}"
   when: envoy_use_includes
-  notify: restart envoy
+  notify: Restart envoy
 
 - name: Create Envoy configuration file from template
   ansible.builtin.template:
@@ -44,4 +44,4 @@
     owner: "{{ envoy_user }}"
     group: "{{ envoy_group }}"
     mode: "0640"
-  notify: restart envoy
+  notify: Restart envoy

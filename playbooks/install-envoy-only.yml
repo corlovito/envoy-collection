@@ -3,10 +3,7 @@
   hosts: all
   become: true
   gather_facts: true
-  
-  vars:
-    # Можно переопределить версию Envoy если нужно
-    # envoy_version: "1.28.0"
+    
 
   roles:
     - role: envoy-install 

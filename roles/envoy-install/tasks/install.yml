@@ -36,12 +36,12 @@
     update_cache: true
 
 - name: Create hot-restarter script
-  ansible.builtin.template:
-    src: hot-restarter.py.j2
+  ansible.builtin.copy:
+    src: hot-restarter.py
     dest: /usr/local/bin/hot-restarter.py
     mode: "0755"
   when: envoy_use_hot_restart
-  notify: reload systemd
+  notify: Reload systemd
 
 - name: Create start-envoy script
   ansible.builtin.template:
@@ -49,11 +49,11 @@
     dest: /usr/local/bin/start-envoy.sh
     mode: "0755"
   when: envoy_use_hot_restart
-  notify: reload systemd
+  notify: Reload systemd
 
 - name: Create systemd service unit
   ansible.builtin.template:
     src: envoy-hot-restart.service.j2
     dest: /etc/systemd/system/envoy.service
     mode: "0644"
-  notify: reload systemd
+  notify: Reload systemd
