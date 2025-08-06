@@ -2,12 +2,13 @@
 
 Этот репозиторий содержит Ansible роли для установки и настройки Envoy Proxy с автоматической установкой BIRD BGP.
 
-**Требования:**
+**Требования для хост-системы:**
 - Python ≥3.10
-- Vagrant и libvirt установлены системно
-- SSH доступ к GitLab (для приватных ролей)
+- Vagrant (для запуска тестовых VM)
+- libvirt (гипервизор для Vagrant)
+- SSH доступ к GitLab (для скачивания приватных ролей)
 
-## Структура проекта
+# Структура проекта
 
 ```
 project/
@@ -151,11 +152,6 @@ ansible-playbook -i playbooks/inventory.yml playbooks/cleanup-envoy.yml
 
 Для скачивания ролей через ansible-galaxy должен быть настроен доступ по ssh к gitlab.evotor.ru
 
-Проверка доступа:
-```bash
-ssh -T git@gitlab.evotor.ru
-# Должно вывести: Welcome to GitLab, @username!
-```
 
 ### Настройка окружения для Molecule:
 
