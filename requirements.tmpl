@@ -1,23 +1,15 @@
 ---
 # Ansible Galaxy dependencies for envoy project
-# Collections
+
 collections:
-  - name: ansible.posix
-    version: ">=2.1.0"
-  - name: community.general
-    version: ">=11.1.0"
-  - name: community.vagrant
-    version: ">=0.0.0"
-  - name: community.vmware
-    version: ">=5.7.0"
-  - name: vmware.vmware
-    version: ">=2.2.0"
-  - name: evotor.basic
-    version: ">=2.3.0"
+  - name: evotor.envoy
+    type: git
+    source: https://${GITLAB_TOKEN:+${GITLAB_TOKEN}@}gitlab.evotor.ru/iaac/ansible/envoy-collection.git
+    version: main
 
 # Roles
 roles:
   - name: os_bird_bgp
     src: "https://${GITLAB_TOKEN:+${GITLAB_TOKEN}@}gitlab.evotor.ru/iaac/ansible/opensearch.git"
     scm: git
-    version: main 
+    version: main
