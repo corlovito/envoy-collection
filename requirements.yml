@@ -18,6 +18,7 @@ collections:
 # Roles
 roles:
   - name: os_bird_bgp
-    src: "git@gitlab.evotor.ru:iaac/ansible/bird-bgp.git"  # Исправлен URL и используется SSH
+    src: "git@gitlab.evotor.ru:iaac/ansible/opensearch.git"
     scm: git
     version: main
+    path: roles/
