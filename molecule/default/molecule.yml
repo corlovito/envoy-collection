@@ -14,11 +14,4 @@ provisioner:
   name: ansible
   options:
     extra-vars: envoy_roles__environment=evo
-  env:
-    ANSIBLE_COLLECTIONS_PATH: ${HOME}/.ansible/collections:/usr/share/ansible/collections
-    ANSIBLE_ROLES_PATH: ${PWD}/roles:${HOME}/.ansible/roles
-    ANSIBLE_STRATEGY: mitogen_linear
-    ANSIBLE_STRATEGY_PLUGINS: ${PWD}/.venv/lib/python3.11/site-packages/ansible_mitogen/plugins/strategy
-    ANSIBLE_CALLBACKS_ENABLED: ansible.posix.profile_tasks
-    ANSIBLE_LIBRARY: ${PWD}/.venv/lib/python3.11/site-packages/molecule_vagrant/modules 
-
+  # env переменные теперь задаются через wrapper или напрямую
