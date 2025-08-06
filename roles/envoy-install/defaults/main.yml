@@ -12,9 +12,6 @@ envoy_use_hot_restart: true  # Use hot-restarter.py for zero-downtime restarts
 envoy_hot_restart_term_wait: 30  # Seconds to wait for graceful shutdown
 envoy_hot_restart_log_level: "INFO"  # Log level for hot-restarter
 
-# Systemd service
-envoy_systemd: true
-
 # BIRD BGP settings (for dependency role)
 os_bird_bgp_address: "10.0.1.255"
 os_bird_bgp_local_as: 65535

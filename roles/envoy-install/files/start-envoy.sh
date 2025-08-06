@@ -1,5 +1,4 @@
 #!/bin/bash
-# {{ ansible_managed }}
 
 # Envoy startup script with hot restart support
 # This script is called by hot-restarter.py

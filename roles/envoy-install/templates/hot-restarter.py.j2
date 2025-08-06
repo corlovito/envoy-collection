@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# {{ ansible_managed }}
 from __future__ import print_function
 
 import os
@@ -12,14 +13,14 @@ import logging
 # NOTE: If using a shutdown mechanism such as runit's `force-stop` which sends
 # a KILL after a specified timeout period, it's important to ensure that this
 # constant is smaller than the KILL timeout
-TERM_WAIT_SECONDS = 30
+TERM_WAIT_SECONDS = {{ envoy_hot_restart_term_wait | default(30) }}
 
 restart_epoch = 0
 pid_list = []
 
 LOG_FORMAT = "[%(asctime)s.%(msecs)03d][%(process)d][%(levelname)s][core] [%(filename)s:%(lineno)d] %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-LOG_LEVEL = logging.INFO
+LOG_LEVEL = logging.{{ envoy_hot_restart_log_level | default('INFO') }}
 logger = logging.getLogger(__name__)
 
 
