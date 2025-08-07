@@ -3,8 +3,6 @@ driver:
   name: vagrant
   provider:
     name: libvirt
-    options:
-      uri: qemu:///session
   provision: true
 platforms:
   - name: debian-node01
